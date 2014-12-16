@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="index.css" />
+  <script type="text/javascript" src="index.js"></script>
+</head>
+<body>
+  <div class="cube-container"></div>
+  <script type="text/javascript">
+    var containers = document.querySelectorAll('.cube-container')
+
+    var cubes = [].map.call(containers, function (container) {
+      return new Cubey(container)
+    })
+  </script>
+</body>
+</html>
