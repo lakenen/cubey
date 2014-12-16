@@ -8,10 +8,9 @@
   <div class="cube-container"></div>
   <script type="text/javascript">
     var containers = document.querySelectorAll('.cube-container')
-
-    var cubes = [].map.call(containers, function (container) {
-      return new Cubey(container)
-    })
+      , cubes = [].map.call(containers, function (container) {
+        return new Cubey(container)
+      })
   </script>
 </body>
 </html>

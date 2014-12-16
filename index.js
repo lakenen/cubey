@@ -1,8 +1,7 @@
 (function () {
   var rAF = window.requestAnimationFrame.bind(window)
     , cAF = window.cancelAnimationFrame.bind(window)
-
-  var TWO_PI = Math.PI * 2
+    , TWO_PI = Math.PI * 2
 
   function Cubey(el) {
     this.el = el
@@ -17,6 +16,9 @@
 
   function bindEvent(el, type, fn) {
     el.addEventListener(type, fn, false)
+  }
+  function unbindEvent(el, type, fn) {
+    el.removeEventListener(type, fn)
   }
 
   function setupDOM(el) {
@@ -48,7 +50,7 @@
   Cubey.prototype.loop = function () {
     this.update()
     this.draw()
-    rAF(this.loop)
+    this.frameId = rAF(this.loop)
   }
 
   Cubey.prototype.search = function () {
@@ -64,23 +66,41 @@
     clearTimeout(this.searchingTID)
   }
 
+  Cubey.prototype.destroy = function () {
+    cAF(this.frameId)
+    this.stopSearching()
+    this.unbindEvents()
+    this.el.innerHTML = ''
+  }
+
   Cubey.prototype.bindEvents = function() {
-    bindEvent(this.el, 'mousemove', this.handleMouseMove.bind(this))
-    bindEvent(this.el, 'mouseenter', this.handleMouseEnter.bind(this))
-    bindEvent(this.el, 'mouseleave', this.handleMouseLeave.bind(this))
+    this.handlers = [
+        [this.el, 'mousemove', this.handleMouseMove.bind(this)]
+      , [this.el, 'mouseenter', this.handleMouseEnter.bind(this)]
+      , [this.el, 'mouseleave', this.handleMouseLeave.bind(this)]
+    ]
+    this.handlers.forEach(function (args) {
+      bindEvent.apply(null, args)
+    })
+  }
+
+  Cubey.prototype.unbindEvents = function () {
+    this.handlers.forEach(function (args) {
+      bindEvent.apply(null, args)
+    })
   }
 
   Cubey.prototype.handleMouseMove = function (event) {
-    var x = event.clientX - this.el.offsetLeft
-      , y = event.clientY - this.el.offsetTop
-
-    this.x = x
-    this.y = y
+    this.x = event.clientX - this.el.offsetLeft
+    this.y = event.clientY - this.el.offsetTop
+    this.stopSearching()
   }
+
   Cubey.prototype.handleMouseEnter = function (event) {
     this.el.classList.add('active')
     this.stopSearching()
   }
+
   Cubey.prototype.handleMouseLeave = function (event) {
     this.el.classList.remove('active')
     this.search()
